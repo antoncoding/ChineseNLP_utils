@@ -5,7 +5,7 @@
 * BeautifulSoup
 
 ### Info
-It's a python beautifulSoup crawler created for **parsing main content without any knowledge of what would the html structure be like**. We designed a recursive function `recursive_get_content` to contruct a dictionary mapping different kind of **tag node** to their contents, then we select the longest one as the `main content` node.
+It's a python beautifulSoup crawler created for **parsing main content without any knowledge of what would the html structure be like**. We designed a recursive function `recursive_get_content` to construct a dictionary mapping different kind of **tag node** to their contents, then we select the longest one as the `main content` node.
 
 ### Example Usage
 Original Link: http://bookmaker-info.com/en/episode-59
