@@ -37,10 +37,10 @@ def super_crawler_v1(url):
         pass
     try:
         comments=soup.find_all(string=lambda text:isinstance(text,Comment))
-       for c in comments:
-           c.decompose()
-   except:
-       pass
+        for c in comments:
+            c.decompose()
+    except:
+        pass
     print('# of descendants after removing headers and footers: {}'.format(len(list(soup.descendants))))
 
     # Delete Javascript
@@ -103,7 +103,7 @@ def recursive_get_content(soup, pre=None, dic={}):
     return dic
 
 
-def get_main_content(soup):
+def get_main_content(soup, return_dic=False):
     '''
     input: (processed) bf object
     output: main text (string)
@@ -112,14 +112,16 @@ def get_main_content(soup):
     length = 0
     longest = ''
     for k, c in content_mapping.items():
-        if len(c)>length:
+        if len(c.strip())>length and k!='_':
             length = len(c)
             longest = c
+    if return_dic:
+        return longest, content_mapping
     return longest
 
 
 if __name__ == '__main__':
     url = argv[1]
     soup, text = super_crawler_v1(url)
-    c = get_main_content(soup)
-    print(c)
+    content, detail_dictionary = get_main_content(soup, True)
+    print(content)
