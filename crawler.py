@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 from sys import argv
 import requests
 
@@ -9,18 +9,25 @@ def process_text(text):
     return text
 
 
-def super_crawler_v1(url):
+def super_crawler_v1(url, verbose=False):
     raw = requests.get(url)
     html = raw.text
     soup = BeautifulSoup(html, 'html.parser')
-    print(soup.title)
-    print('Original # of descendants: {}'.format(len(list(soup.descendants))))
+    title = str(soup.title)
+    if verbose:
+        print('Original # of descendants: {}'.format(len(list(soup.descendants))))
 
     # Remove list of links
     for li in soup.find_all('li'):
         if li.find('a') != None:
             li.decompose()
-    print('# of descendants after removing url lists: {}'.format(len(list(soup.descendants))))
+
+    # Remove Table
+    for table in soup.find_all('table'):
+        table.decompose()
+
+    if verbose:
+        print('# of descendants after removing url lists: {}'.format(len(list(soup.descendants))))
 
     # Remove Header, Footers
     try:
@@ -36,17 +43,20 @@ def super_crawler_v1(url):
     except:
         pass
     try:
-        comments=soup.find_all(string=lambda text:isinstance(text,Comment))
-        for c in comments:
-            c.decompose()
+        for element in soup.find_all(text=lambda text: isinstance(text, Comment)):
+            element.extract()
     except:
         pass
-    print('# of descendants after removing headers and footers: {}'.format(len(list(soup.descendants))))
+
+    if verbose:
+        print('# of descendants after removing headers and footers: {}'.format(len(list(soup.descendants))))
 
     # Delete Javascript
     for script in soup(["script", "style", "select"]):
         script.decompose()    # rip it out
-    print('# of descendants after removing Javascript: {}'.format(len(list(soup.descendants))))
+
+    if verbose:
+        print('# of descendants after removing Javascript: {}'.format(len(list(soup.descendants))))
 
     for e in soup.find_all('br'):
         e.decompose()
@@ -61,12 +71,14 @@ def super_crawler_v1(url):
                 a.decompose()
         except:
             pass
-    print('# of descendants after removing links: {}'.format(len(list(soup.descendants))))
+
+    if verbose:
+        print('# of descendants after removing links: {}'.format(len(list(soup.descendants))))
 
     text = soup.get_text()
     text = process_text(text)
 
-    return soup, text
+    return soup, text, title
 
 
 def recursive_get_content(soup, pre=None, dic={}):
@@ -122,6 +134,6 @@ def get_main_content(soup, return_dic=False):
 
 if __name__ == '__main__':
     url = argv[1]
-    soup, text = super_crawler_v1(url)
+    soup, text, title = super_crawler_v1(url)
     content, detail_dictionary = get_main_content(soup, True)
-    print(content)
+    print(title + ':' + content)
