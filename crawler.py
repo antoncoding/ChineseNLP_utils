@@ -10,7 +10,8 @@ def process_text(text):
 
 
 def super_crawler_v1(url, verbose=False):
-    raw = requests.get(url)
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    raw = requests.get(url, headers=headers)
     html = raw.text
     soup = BeautifulSoup(html, 'html.parser')
     title = str(soup.title)
